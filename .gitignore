@@ -49,3 +49,6 @@ prisma/dev.db-journal
 # foundry build artifacts
 contracts/cache/
 contracts/out/
+
+.vercel
+.env*
