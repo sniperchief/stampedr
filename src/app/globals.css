@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #ffffff;
+  --ink: #1c1b19;
+  --ink-muted: #8a8378;
+  --border: #e7ecf0;
+  --stamp: #a13327;
+  --stamp-dark: #7e281f;
+  --sky: #5fa8d3;
+  --sky-dark: #4a8fb8;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-border: var(--border);
+  --color-stamp: var(--stamp);
+  --color-stamp-dark: var(--stamp-dark);
+  --color-sky: var(--sky);
+  --color-sky-dark: var(--sky-dark);
+  --font-display: var(--font-display-raw);
+  --font-sans: var(--font-body-raw);
+  --font-mono: var(--font-mono-raw);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sky);
+  outline-offset: 2px;
+}
+
+/* A row of punched circles along the top/bottom edge of a card, like a
+   torn receipt slip. The circles are cut from the card in the page's own
+   background color so they read as holes rather than dots. */
+.perforated {
+  position: relative;
+}
+.perforated::before,
+.perforated::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background-image: radial-gradient(circle, var(--paper) 5px, transparent 5.5px);
+  background-size: 18px 18px;
+  background-position: 9px center;
+  background-repeat: repeat-x;
+  pointer-events: none;
+}
+.perforated::before {
+  top: -7px;
+}
+.perforated::after {
+  bottom: -7px;
+}
+
+@keyframes stamp-press {
+  0% {
+    transform: scale(2.4) rotate(-30deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(0.92) rotate(-6deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(-8deg);
+    opacity: 1;
+  }
+}
+.stamp-press-animate {
+  animation: stamp-press 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

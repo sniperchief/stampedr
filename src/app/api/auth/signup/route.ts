@@ -1,0 +1,70 @@
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import { parseEther } from "viem";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { prisma } from "@/lib/db";
+import { createSession } from "@/lib/session";
+import { treasuryWalletClient } from "@/lib/serverWallet";
+import { encryptPrivateKey } from "@/lib/walletEncryption";
+
+const SIGNUP_FUNDING_AMOUNT = parseEther("0.05");
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const { email, password } = body as Record<string, unknown>;
+
+  if (typeof email !== "string" || !isValidEmail(email)) {
+    return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
+  }
+  if (typeof password !== "string" || password.length < 8) {
+    return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+  if (existing) {
+    return NextResponse.json({ error: "An account with that email already exists." }, { status: 409 });
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  const newPrivateKey = generatePrivateKey();
+  const newAccount = privateKeyToAccount(newPrivateKey);
+  const encryptedKey = encryptPrivateKey(newPrivateKey);
+
+  const user = await prisma.user.create({
+    data: {
+      email: normalizedEmail,
+      passwordHash,
+      walletAddress: newAccount.address,
+      encryptedKey,
+    },
+  });
+
+  // Fund the new wallet from the app's treasury so the freelancer can start
+  // stamping receipts immediately, with no manual faucet step of their own.
+  // Native MON transfers are always exactly 21,000 gas on Monad — no estimate needed.
+  try {
+    await treasuryWalletClient.sendTransaction({
+      to: newAccount.address,
+      value: SIGNUP_FUNDING_AMOUNT,
+      gas: 21000n,
+    });
+  } catch (error) {
+    console.error("Failed to auto-fund new user wallet", error);
+    // Don't fail signup over this — the account still works, it just needs manual funding.
+  }
+
+  await createSession(user.id);
+
+  return NextResponse.json({ success: true, walletAddress: newAccount.address });
+}
