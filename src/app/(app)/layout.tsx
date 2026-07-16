@@ -11,18 +11,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-full flex-col">
       <header className="border-b-2 border-sky">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
-          <Link href="/">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <Link href="/" className="shrink-0">
             <Image
               src="/stampedr-logo.png"
               alt="Stampedr"
               width={928}
               height={202}
               priority
-              className="h-12 w-auto sm:h-14"
+              className="h-7 w-auto sm:h-12 md:h-14"
             />
           </Link>
-          <nav className="flex items-center gap-4 text-sm">
+          <nav className="flex shrink-0 items-center gap-3 text-sm sm:gap-4">
             {user ? (
               <>
                 <Link href="/" className="text-ink-muted hover:text-ink">
@@ -37,7 +37,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 </Link>
                 <Link
                   href="/signup"
-                  className="rounded-md bg-sky px-3 py-1.5 font-medium text-white hover:bg-sky-dark"
+                  className="rounded-md bg-sky px-3 py-2 font-medium text-white hover:bg-sky-dark"
                 >
                   Sign up
                 </Link>
@@ -47,10 +47,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-10">{children}</main>
 
       <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
+        <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-8 text-center sm:flex-row sm:justify-between sm:px-6 sm:text-left">
           <div>
             <p className="font-display text-sm font-semibold text-ink">Stampedr</p>
             <p className="mt-0.5 text-xs text-ink-muted">Proof you sent it.</p>

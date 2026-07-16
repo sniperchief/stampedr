@@ -115,22 +115,22 @@ export default function NewReceiptPage() {
           </p>
         </div>
 
-        <div className="flex w-full max-w-md items-center gap-2 rounded-md border border-border p-3">
+        <div className="flex w-full max-w-md flex-col items-stretch gap-2 rounded-md border border-border p-3 sm:flex-row sm:items-center">
           <input
             readOnly
             value={shareUrl}
-            className="flex-1 bg-transparent font-mono text-sm text-ink outline-none"
+            className="min-w-0 flex-1 bg-transparent font-mono text-sm text-ink outline-none"
           />
           <button
             type="button"
             onClick={() => navigator.clipboard.writeText(shareUrl)}
-            className="rounded-md bg-sky px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-dark"
+            className="shrink-0 rounded-md bg-sky px-3 py-2 text-sm font-medium text-white hover:bg-sky-dark"
           >
             Copy link
           </button>
         </div>
 
-        <div className="flex gap-4 text-sm">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm">
           <Link href={`/receipt/${result.receiptId}`} className="text-sky hover:underline">
             View public receipt →
           </Link>
@@ -153,11 +153,11 @@ export default function NewReceiptPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <div className="mb-2 flex gap-1 text-sm">
+          <div className="mb-2 flex flex-wrap gap-2 text-sm">
             <button
               type="button"
               onClick={() => setMode("file")}
-              className={`rounded-md px-3 py-1.5 ${
+              className={`rounded-md px-3 py-2 ${
                 mode === "file" ? "bg-ink text-paper" : "border border-border text-ink-muted"
               }`}
             >
@@ -166,7 +166,7 @@ export default function NewReceiptPage() {
             <button
               type="button"
               onClick={() => setMode("text")}
-              className={`rounded-md px-3 py-1.5 ${
+              className={`rounded-md px-3 py-2 ${
                 mode === "text" ? "bg-ink text-paper" : "border border-border text-ink-muted"
               }`}
             >

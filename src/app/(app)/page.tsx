@@ -165,7 +165,7 @@ async function Dashboard({ walletAddress }: { walletAddress: `0x${string}` }) {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink">Dashboard</h1>
           <p className="mt-1 text-sm text-ink-muted">
@@ -175,7 +175,7 @@ async function Dashboard({ walletAddress }: { walletAddress: `0x${string}` }) {
         </div>
         <Link
           href="/new"
-          className="shrink-0 rounded-md bg-sky px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-dark"
+          className="self-start rounded-md bg-sky px-3 py-2 text-sm font-medium text-white hover:bg-sky-dark sm:shrink-0"
         >
           + New receipt
         </Link>
@@ -187,22 +187,24 @@ async function Dashboard({ walletAddress }: { walletAddress: `0x${string}` }) {
           return (
             <div
               key={receipt.id}
-              className={`flex items-center gap-4 border-l-4 py-3 pl-4 pr-2 ${
+              className={`flex flex-col gap-2 border-l-4 py-3 pl-4 pr-2 sm:flex-row sm:items-center sm:gap-4 ${
                 isOverdue ? "border-l-stamp" : "border-l-transparent"
               }`}
             >
-              <span className="w-14 shrink-0 font-mono text-xs text-ink-muted">
-                {receiptNumber(receipt.id)}
-              </span>
+              <div className="flex items-center gap-3 sm:contents">
+                <span className="w-10 shrink-0 font-mono text-xs text-ink-muted sm:w-14">
+                  {receiptNumber(receipt.id)}
+                </span>
 
-              <div className="min-w-0 flex-1">
-                <Link href={`/receipt/${receipt.id}`} className="font-medium text-ink hover:underline">
-                  {receipt.description}
-                </Link>
-                <p className="text-sm text-ink-muted">{receipt.clientName}</p>
+                <div className="min-w-0 flex-1">
+                  <Link href={`/receipt/${receipt.id}`} className="font-medium text-ink hover:underline">
+                    {receipt.description}
+                  </Link>
+                  <p className="text-sm text-ink-muted">{receipt.clientName}</p>
+                </div>
               </div>
 
-              <div className="flex shrink-0 items-center gap-3">
+              <div className="flex items-center justify-between gap-3 sm:contents">
                 {receipt.paid ? (
                   <span className="flex items-center gap-1 text-sm font-medium text-sky">
                     <span aria-hidden>✓</span> Paid
@@ -210,22 +212,22 @@ async function Dashboard({ walletAddress }: { walletAddress: `0x${string}` }) {
                 ) : (
                   <MarkPaidButton receiptId={receipt.id} />
                 )}
-              </div>
 
-              <div
-                className="w-28 shrink-0 text-right font-mono text-xs text-ink-muted"
-                title={formatUnixSeconds(receipt.createdAt)}
-              >
-                {receipt.dueDate > 0 ? (
-                  <>
-                    <div>due {formatDateOnly(receipt.dueDate)}</div>
-                    {isOverdue && (
-                      <div className="text-stamp">{daysOverdue(receipt.dueDate, nowSeconds)}d overdue</div>
-                    )}
-                  </>
-                ) : (
-                  <span>—</span>
-                )}
+                <div
+                  className="text-right font-mono text-xs text-ink-muted sm:w-28 sm:shrink-0"
+                  title={formatUnixSeconds(receipt.createdAt)}
+                >
+                  {receipt.dueDate > 0 ? (
+                    <>
+                      <div>due {formatDateOnly(receipt.dueDate)}</div>
+                      {isOverdue && (
+                        <div className="text-stamp">{daysOverdue(receipt.dueDate, nowSeconds)}d overdue</div>
+                      )}
+                    </>
+                  ) : (
+                    <span>—</span>
+                  )}
+                </div>
               </div>
             </div>
           );

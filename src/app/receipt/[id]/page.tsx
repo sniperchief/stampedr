@@ -57,11 +57,11 @@ export default async function PublicReceiptPage({
         <dl className="mt-8 space-y-3 text-sm">
           <div className="flex gap-2">
             <dt className="w-28 shrink-0 text-ink-muted">Delivered to</dt>
-            <dd className="text-ink">{receipt.clientName}</dd>
+            <dd className="min-w-0 flex-1 break-words text-ink">{receipt.clientName}</dd>
           </div>
           <div className="flex gap-2">
             <dt className="w-28 shrink-0 text-ink-muted">What</dt>
-            <dd className="text-ink">{receipt.description}</dd>
+            <dd className="min-w-0 flex-1 break-words text-ink">{receipt.description}</dd>
           </div>
           <div className="flex gap-2">
             <dt className="w-28 shrink-0 text-ink-muted">Sent</dt>

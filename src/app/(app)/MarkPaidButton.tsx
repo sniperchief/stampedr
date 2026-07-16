@@ -32,7 +32,7 @@ export function MarkPaidButton({ receiptId }: { receiptId: number }) {
         type="button"
         onClick={handleClick}
         disabled={pending}
-        className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-ink hover:border-sky hover:text-sky disabled:cursor-not-allowed disabled:opacity-50"
+        className="rounded-md border border-border px-3 py-2 text-xs font-medium text-ink hover:border-sky hover:text-sky disabled:cursor-not-allowed disabled:opacity-50"
       >
         {pending ? "Marking..." : "Mark as paid"}
       </button>
