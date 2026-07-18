@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { formatDateOnly, formatUnixSeconds } from "@/lib/format";
-import { fetchReceipt, fetchReceiptIdsByCreator } from "@/lib/receipts";
+import { fetchReceipt, fetchReceiptIdsByCreator, receiptDisplayNumber } from "@/lib/receipts";
 import { MarkPaidButton } from "./MarkPaidButton";
 
 // Always reflect live chain state — never a cached/static snapshot.
@@ -193,7 +193,7 @@ async function Dashboard({ walletAddress }: { walletAddress: `0x${string}` }) {
             >
               <div className="flex items-center gap-3 sm:contents">
                 <span className="w-10 shrink-0 font-mono text-xs text-ink-muted sm:w-14">
-                  {receiptNumber(receipt.id)}
+                  {receiptNumber(receiptDisplayNumber(ids, receipt.id))}
                 </span>
 
                 <div className="min-w-0 flex-1">

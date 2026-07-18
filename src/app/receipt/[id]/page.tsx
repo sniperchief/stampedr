@@ -2,7 +2,13 @@ import { BaseError, ContractFunctionRevertedError } from "viem";
 import { StampMark } from "@/app/StampMark";
 import { MONAD_TESTNET_EXPLORER } from "@/lib/chain";
 import { formatDateOnly, formatUnixSeconds } from "@/lib/format";
-import { fetchBlockState, fetchCreationInfo, fetchReceipt } from "@/lib/receipts";
+import {
+  fetchBlockState,
+  fetchCreationInfo,
+  fetchReceipt,
+  fetchReceiptIdsByCreator,
+  receiptDisplayNumber,
+} from "@/lib/receipts";
 
 // This page must reflect real chain state on every visit, never a cached snapshot.
 export const dynamic = "force-dynamic";
@@ -43,6 +49,8 @@ export default async function PublicReceiptPage({
 
   const creation = await fetchCreationInfo(receiptId);
   const blockState = creation ? await fetchBlockState(creation.blockNumber) : null;
+  const creatorIds = await fetchReceiptIdsByCreator(receipt.creator as `0x${string}`);
+  const displayNumber = receiptDisplayNumber(creatorIds, receiptId);
 
   const hasDueDate = receipt.dueDate > 0;
   const deliveredOnTime = hasDueDate ? receipt.createdAt <= receipt.dueDate : null;
@@ -51,7 +59,7 @@ export default async function PublicReceiptPage({
     <div className="flex min-h-full items-center justify-center px-4 py-16">
       <div className="perforated w-full max-w-md border border-border bg-paper px-8 pb-8 pt-10 shadow-[0_1px_3px_rgba(28,27,25,0.08)]">
         <h1 className="text-center font-display text-lg font-semibold uppercase tracking-wide text-ink">
-          Stampedr — Receipt #{String(receiptId).padStart(4, "0")}
+          Stampedr — Receipt #{String(displayNumber).padStart(4, "0")}
         </h1>
 
         <dl className="mt-8 space-y-3 text-sm">
@@ -87,7 +95,7 @@ export default async function PublicReceiptPage({
         </dl>
 
         <div className="mt-10 flex flex-col items-center">
-          <StampMark receiptId={receiptId} />
+          <StampMark receiptId={displayNumber} />
           <p className="mt-4 text-center text-sm text-ink-muted">
             verified unchanged
             <br />

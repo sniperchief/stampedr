@@ -9,6 +9,7 @@ type InputMode = "file" | "text";
 
 type CreateResult = {
   receiptId: number;
+  displayNumber: number;
   txHash: string;
 };
 
@@ -92,7 +93,7 @@ export default function NewReceiptPage() {
         setError(friendlyError(data.error ?? "Something went wrong."));
         return;
       }
-      setResult({ receiptId: data.receiptId, txHash: data.txHash });
+      setResult({ receiptId: data.receiptId, displayNumber: data.displayNumber, txHash: data.txHash });
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
     } finally {
@@ -104,11 +105,11 @@ export default function NewReceiptPage() {
     const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/receipt/${result.receiptId}` : "";
     return (
       <div className="mx-auto flex max-w-md flex-col items-center space-y-6 py-6 text-center">
-        <StampMark receiptId={result.receiptId} className="stamp-press-animate" />
+        <StampMark receiptId={result.displayNumber} className="stamp-press-animate" />
 
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink">
-            Receipt #{String(result.receiptId).padStart(4, "0")} is stamped
+            Receipt #{String(result.displayNumber).padStart(4, "0")} is stamped
           </h1>
           <p className="mt-2 text-sm text-ink-muted">
             Share this link with your client — it proves exactly what was sent and when.

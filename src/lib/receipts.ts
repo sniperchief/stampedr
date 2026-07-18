@@ -45,6 +45,19 @@ export async function fetchReceiptIdsByCreator(creator: `0x${string}`): Promise<
   return ids.map((id) => Number(id));
 }
 
+/**
+ * Receipt ids are a single counter shared across every creator on the
+ * contract, so a brand-new user's first-ever receipt can land on a high
+ * number (e.g. #0047) just because other freelancers used the app before
+ * them. `creatorIds` (from fetchReceiptIdsByCreator, already in creation
+ * order) lets us show each freelancer their own 1-indexed sequence instead
+ * — the on-chain id remains the real identifier for lookups/URLs.
+ */
+export function receiptDisplayNumber(creatorIds: number[], id: number): number {
+  const index = creatorIds.indexOf(id);
+  return index === -1 ? id : index + 1;
+}
+
 export type CreationInfo = { txHash: `0x${string}`; blockNumber: bigint };
 
 const LOG_RANGE_CHUNK = 100n; // Monad's public testnet RPC caps eth_getLogs to a 100-block range per call.

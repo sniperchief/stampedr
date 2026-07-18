@@ -40,7 +40,9 @@ export default function SignupPage() {
     <div className="flex min-h-full items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex justify-center">
-          <Image src="/stampedr-logo.png" alt="Stampedr" width={928} height={202} className="h-12 w-auto" />
+          <Link href="/">
+            <Image src="/stampedr-logo.png" alt="Stampedr" width={928} height={202} className="h-12 w-auto" />
+          </Link>
         </div>
 
         <h1 className="text-center font-display text-xl font-semibold text-ink">Sign up</h1>

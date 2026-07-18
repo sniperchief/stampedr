@@ -40,7 +40,9 @@ function LoginForm() {
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8 flex justify-center">
-        <Image src="/stampedr-logo.png" alt="Stampedr" width={928} height={202} className="h-12 w-auto" />
+        <Link href="/">
+          <Image src="/stampedr-logo.png" alt="Stampedr" width={928} height={202} className="h-12 w-auto" />
+        </Link>
       </div>
 
       <h1 className="text-center font-display text-xl font-semibold text-ink">Log in</h1>
