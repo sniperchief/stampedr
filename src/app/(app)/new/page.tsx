@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { StampMark } from "@/app/StampMark";
+import { MONAD_TESTNET_EXPLORER } from "@/lib/chain";
 import { sha256OfFile, sha256OfText } from "@/lib/clientHash";
 
 type InputMode = "file" | "text";
@@ -135,6 +136,14 @@ export default function NewReceiptPage() {
           <Link href={`/receipt/${result.receiptId}`} className="text-sky hover:underline">
             View public receipt →
           </Link>
+          <a
+            href={`${MONAD_TESTNET_EXPLORER}/tx/${result.txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sky hover:underline"
+          >
+            View on Monad Explorer →
+          </a>
           <Link href="/" className="text-ink-muted hover:text-ink">
             Back to dashboard
           </Link>

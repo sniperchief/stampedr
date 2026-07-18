@@ -80,14 +80,14 @@ function Homepage() {
             </div>
             <div className="flex gap-2">
               <dt className="w-16 shrink-0 text-ink-muted">Sent</dt>
-              <dd className="font-mono text-ink">Jul 12, 2026</dd>
+              <dd className="font-mono text-ink">Jul 17, 2026</dd>
             </div>
             <div className="flex gap-2">
               <dt className="w-16 shrink-0 text-ink-muted">Hash</dt>
               <dd className="font-mono text-ink">9f3a...c221</dd>
             </div>
           </dl>
-          <p className="mt-6 text-center text-xs text-sky">✓ verified unchanged since Jul 12, 2026</p>
+          <p className="mt-6 text-center text-xs text-sky">✓ verified unchanged since Jul 17, 2026</p>
         </div>
       </section>
 
