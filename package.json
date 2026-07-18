@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "rotate-wallet-key": "node scripts/rotate-wallet-key.mts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

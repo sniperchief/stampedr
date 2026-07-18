@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { BaseError, ContractFunctionRevertedError } from "viem";
+import { BaseError, ContractFunctionRevertedError, InsufficientFundsError } from "viem";
 import { getCurrentUser } from "@/lib/auth";
 import { publicClient } from "@/lib/chain";
 import { STAMPED_ABI, STAMPED_CONTRACT_ADDRESS } from "@/lib/contract";
@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { estimateGasWithBuffer } from "@/lib/gas";
 import { getUserWalletClient } from "@/lib/serverWallet";
 import { decryptPrivateKey } from "@/lib/walletEncryption";
+import { ensureWalletFunded, WALLET_FUNDING_ERROR_MESSAGE } from "@/lib/walletFunding";
 
 function revertReason(error: unknown): string | null {
   if (error instanceof BaseError) {
@@ -16,6 +17,13 @@ function revertReason(error: unknown): string | null {
     }
   }
   return null;
+}
+
+function isInsufficientFundsError(error: unknown): boolean {
+  if (error instanceof BaseError) {
+    return error.walk((e) => e instanceof InsufficientFundsError) instanceof InsufficientFundsError;
+  }
+  return false;
 }
 
 export async function POST(_request: Request, context: { params: Promise<{ id: string }> }) {
@@ -35,6 +43,17 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
 
   try {
     const dbUser = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
+
+    if (!dbUser.walletFundedAt) {
+      const funded = await ensureWalletFunded({
+        ...dbUser,
+        walletAddress: dbUser.walletAddress as `0x${string}`,
+      });
+      if (!funded) {
+        return NextResponse.json({ error: WALLET_FUNDING_ERROR_MESSAGE }, { status: 503 });
+      }
+    }
+
     const walletClient = getUserWalletClient(decryptPrivateKey(dbUser.encryptedKey));
 
     // The contract itself enforces that only the receipt's original creator
@@ -74,6 +93,9 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
     const reason = revertReason(error);
     if (reason) {
       return NextResponse.json({ error: reason }, { status: 409 });
+    }
+    if (isInsufficientFundsError(error)) {
+      return NextResponse.json({ error: WALLET_FUNDING_ERROR_MESSAGE }, { status: 503 });
     }
     console.error("markPaid failed", error);
     return NextResponse.json({ error: "Failed to mark receipt paid on-chain" }, { status: 502 });

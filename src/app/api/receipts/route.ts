@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { BaseError, ContractFunctionRevertedError, decodeEventLog } from "viem";
+import { BaseError, ContractFunctionRevertedError, InsufficientFundsError, decodeEventLog } from "viem";
 import { getCurrentUser } from "@/lib/auth";
 import { publicClient } from "@/lib/chain";
 import { STAMPED_ABI, STAMPED_CONTRACT_ADDRESS } from "@/lib/contract";
 import { estimateGasWithBuffer } from "@/lib/gas";
-import { fetchReceipt, fetchReceiptIdsByCreator } from "@/lib/receipts";
+import { fetchReceipt, fetchReceiptIdsByCreator, receiptDisplayNumber } from "@/lib/receipts";
 import { getUserWalletClient } from "@/lib/serverWallet";
 import { decryptPrivateKey } from "@/lib/walletEncryption";
+import { ensureWalletFunded, WALLET_FUNDING_ERROR_MESSAGE } from "@/lib/walletFunding";
 import { prisma } from "@/lib/db";
 
 function revertReason(error: unknown): string | null {
@@ -17,6 +18,13 @@ function revertReason(error: unknown): string | null {
     }
   }
   return null;
+}
+
+function isInsufficientFundsError(error: unknown): boolean {
+  if (error instanceof BaseError) {
+    return error.walk((e) => e instanceof InsufficientFundsError) instanceof InsufficientFundsError;
+  }
+  return false;
 }
 
 export async function GET() {
@@ -68,6 +76,17 @@ export async function POST(request: NextRequest) {
 
   try {
     const dbUser = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
+
+    if (!dbUser.walletFundedAt) {
+      const funded = await ensureWalletFunded({
+        ...dbUser,
+        walletAddress: dbUser.walletAddress as `0x${string}`,
+      });
+      if (!funded) {
+        return NextResponse.json({ error: WALLET_FUNDING_ERROR_MESSAGE }, { status: 503 });
+      }
+    }
+
     const walletClient = getUserWalletClient(decryptPrivateKey(dbUser.encryptedKey));
 
     // Simulate first so a call that would revert never gets broadcast (and
@@ -113,8 +132,14 @@ export async function POST(request: NextRequest) {
         ? Number(createdLog.args.receiptId)
         : null;
 
+    const displayNumber =
+      receiptId !== null
+        ? receiptDisplayNumber(await fetchReceiptIdsByCreator(user.walletAddress), receiptId)
+        : null;
+
     return NextResponse.json({
       receiptId,
+      displayNumber,
       txHash,
       blockNumber: txReceipt.blockNumber.toString(),
       status: txReceipt.status,
@@ -123,6 +148,9 @@ export async function POST(request: NextRequest) {
     const reason = revertReason(error);
     if (reason) {
       return NextResponse.json({ error: reason }, { status: 409 });
+    }
+    if (isInsufficientFundsError(error)) {
+      return NextResponse.json({ error: WALLET_FUNDING_ERROR_MESSAGE }, { status: 503 });
     }
     console.error("createReceipt failed", error);
     return NextResponse.json({ error: "Failed to create receipt on-chain" }, { status: 502 });
